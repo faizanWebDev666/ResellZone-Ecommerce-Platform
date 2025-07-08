@@ -1,0 +1,39 @@
+<?php
+// Database connection settings
+$servername = "localhost"; // Default localhost for XAMPP
+$username = "root";        // Default username for MySQL in XAMPP
+$password = "";            // Default password for MySQL in XAMPP (blank by default)
+$dbname = "reviews";       // Name of the database you created earlier
+
+// Create a connection to the database
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+// Check if the connection was successful
+if ($conn->connect_error) {
+    die("Connection failed: " . $conn->connect_error); // Exit if connection fails
+}
+
+// Check if the form was submitted using the POST method
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    // Get the form data from the POST request
+    $title = $_POST['title'];       // Title of the review
+    $name = $_POST['name'];         // Name of the user
+    $email = $_POST['email'];       // Email of the user
+    $review = $_POST['review'];     // Review text
+
+    // Prepare the SQL query to insert the data into the database
+    $stmt = $conn->prepare("INSERT INTO feedback (title, name, email, review) VALUES (?, ?, ?, ?)");
+    $stmt->bind_param("ssss", $title, $name, $email, $review); // Bind parameters to the query
+
+    // Execute the query and check if the insertion was successful
+    if ($stmt->execute()) {
+        echo "Review submitted successfully!"; // Success message
+    } else {
+        echo "Error: " . $stmt->error; // Error message if insertion fails
+    }
+
+    // Close the statement and the connection
+    $stmt->close();
+    $conn->close();
+}
+?>
