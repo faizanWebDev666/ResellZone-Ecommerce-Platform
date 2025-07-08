@@ -20,12 +20,9 @@ use App\Models\Users;
 
 class AdminController extends Controller
 {
-
-
-
     public function sellerRegistrationRequests()
     {
-        $sellers = SellersRegistration::all(); // Fetch all records
+        $sellers = SellersRegistration::all(); 
         return view('backend.sellerRegistrationRequests', compact('sellers'));
     }
     public function approveSeller(Request $request)
@@ -39,7 +36,6 @@ class AdminController extends Controller
     $seller->status = 'approved';
     $seller->save();
 
-    // Send email notification
     $details = [
         'title' => "Congratulations! Your Seller Account is Approved",
         'message' => "Dear {$seller->name},\n\n" .
@@ -53,10 +49,8 @@ class AdminController extends Controller
     ];
 
     Mail::to($seller->email)->send(new \App\Mail\SellerApprovalNotification($details));
-
     return response()->json(['success' => true, 'message' => 'Seller approved successfully & email sent']);
 }
-
     public function unapprove(Request $request)
     {
         $seller = SellersRegistration::find($request->id);
@@ -84,39 +78,32 @@ $subscriptions=Newsletter::all();
 
     public function updateProfile(Request $request)
 {
-    // Retrieve user from session
     $admin = User::find(session('id'));
 
     if (!$admin) {
         return redirect()->route('login')->with('error', 'Please log in first.');
     }
 
-    // Validate request
     $request->validate([
         'admin_profile' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
         'cover_pic' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:4096',
     ]);
 
-    // Debugging: Check if file is uploaded
     if ($request->hasFile('admin_profile')) {
-        // Delete old image if exists
         if ($admin->admin_profile) {
             Storage::disk('public')->delete($admin->admin_profile);
         }
 
-        // Store new image
         $profilePath = $request->file('admin_profile')->store('profile_images', 'public');
 
         if (!$profilePath) {
             return redirect()->back()->with('error', 'Failed to upload profile picture.');
         }
 
-        // Debugging: Ensure profile path is set
         $admin->admin_profile = $profilePath;
         \Log::info('Profile Image Path: ' . $profilePath);
     }
 
-    // Handle cover image upload
     if ($request->hasFile('cover_pic')) {
         if ($admin->cover_pic) {
             Storage::disk('public')->delete($admin->cover_pic);
@@ -126,22 +113,16 @@ $subscriptions=Newsletter::all();
         $admin->cover_pic = $coverPath;
     }
 
-    // Debugging: Ensure admin profile is not null
     if (empty($admin->admin_profile)) {
         return redirect()->back()->with('error', 'Profile picture not saved.');
     }
 
-    // Save to database
     $admin->save();
-
-    // Debugging: Check if DB updated
     if (!$admin->wasChanged('admin_profile')) {
         return redirect()->back()->with('error', 'Database update failed.');
     }
 
-    // Store in session after successful save
     session()->put('profile_picture', $admin->admin_profile);
-
     return redirect()->back()->with('success', 'Profile updated successfully!');
 }
 
@@ -172,11 +153,6 @@ Mail::to($product->seller->email)->send(new LowRatingAlert($product));
 
     return view('backend.adminproducts', compact('products'));
 }
-
-
-
-
-
 public function showProductsWithSales(Request $request)
 {
     $query = DB::table('products')
@@ -204,22 +180,18 @@ public function showProductsWithSales(Request $request)
             'orders.payment_method'
         );
 
-    // ✅ Filter: Date Range
     if ($request->start_date && $request->end_date) {
         $query->whereBetween('orders.created_at', [$request->start_date, $request->end_date]);
     }
 
-    // ✅ Filter: Category
     if ($request->category) {
         $query->where('products.category', $request->category);
     }
 
-    // ✅ Filter: Payment Method
     if ($request->payment_method) {
         $query->where('orders.payment_method', $request->payment_method);
     }
 
-    // ✅ Sorting
     if ($request->sort_by === 'top_selling') {
         $query->orderByDesc(DB::raw('SUM(order_items.quantity)'));
     } elseif ($request->sort_by === 'lowest_selling') {
@@ -230,16 +202,11 @@ public function showProductsWithSales(Request $request)
 
     return view('backend.adminTotal-Sales', compact('products'));
 }
-
-
-
 public function adminOrders()
 {
     $Orders = Order::with('orderItems.product')->get();
     return view('backend.adminOrders', compact('Orders'));
 }
-
-
     public function searchContacts(Request $request)
 {
     $query = $request->input('query');
@@ -293,7 +260,6 @@ public function adminOrders()
 
 public function index()
 {
-    // Restrict access to admin users only
     if (session('type') !== 'admin') {
         return redirect('/')->with('error', 'Unauthorized access.');
     }
@@ -333,7 +299,6 @@ foreach ($statuses as $status) {
         ->orderBy('month_num')
         ->get();
 
-    // Set the labels only once
     if (empty($monthLabels)) {
         $monthLabels = $results->pluck('month')->toArray();
     }
@@ -351,10 +316,6 @@ foreach ($statuses as $status) {
 ));
 
 }
-
-/**
- * Calculate Percentage Change
- */
 private function calculatePercentageChange($today, $total)
 {
     if ($total == 0) {

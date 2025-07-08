@@ -36,17 +36,16 @@ public function markAllAsRead()
 
 public function clearAll()
 {
-    Contact::truncate(); // Deletes all records
+    Contact::truncate(); 
     return response()->json(['message' => 'All notifications cleared']);
 }
 
-    public function getUnreadContacts()
-    {
+public function getUnreadContacts()
+{
         $contacts = Contact::where('status', 'unread')->latest()->get();
         return response()->json($contacts);
-    }
-
-    public function sellerUpdatePassword()
+}
+public function sellerUpdatePassword()
 {
 return view('sellerUpdatePassword');
 }
@@ -89,10 +88,7 @@ return view('registerSeller', compact('User'));
 
     public function sellerregister(Request $request)
 {
-    // Get the logged-in user
     $user = auth()->user();
-
-    // Check if seller already applied and is pending or approved
     $existing = DB::table('sellers_registrations')
         ->where('user_id', $user->id)
         ->whereIn('status', ['pending', 'approved'])
@@ -102,7 +98,6 @@ return view('registerSeller', compact('User'));
         return redirect()->back()->with('error', 'You have already applied. Wait for approval.');
     }
 
-    // Validate input data
     $request->validate([
         'name'        => 'required|string|max:255',
         'store_name'  => 'required|string|max:255|unique:sellers_registrations,store_name',
@@ -111,7 +106,6 @@ return view('registerSeller', compact('User'));
         'address'     => 'required|string',
     ]);
 
-    // Create a new seller registration
     $seller = new SellersRegistration([
         'user_id'     => $user->id,
         'name'        => $request->input('name'),
@@ -126,38 +120,26 @@ return view('registerSeller', compact('User'));
 
     return redirect()->route('home')->with('success', 'Your registration has been submitted. We will contact you for store verification.');
 }
-
-
     public function downloadOrdersPdf()
     {
         $orders = Order::all();
         $orderItems = OrderItem::all();
-        $users = User::all()->keyBy('id'); // Fetch customers using their `id`
-        $products = Product::all()->keyBy('id'); // Fetch products using their `id`
-
+        $users = User::all()->keyBy('id'); 
+        $products = Product::all()->keyBy('id'); 
         $phpWord = new PhpWord();
         $section = $phpWord->addSection();
-
-        // Title
         $section->addText('Orders Report', ['bold' => true, 'size' => 16], ['alignment' => 'center']);
         $section->addTextBreak(1);
-
-        // Table
         $table = $section->addTable();
-
-        // Table Header
         $table->addRow();
         $headers = ['Order ID', 'Product Name', 'Quantity', 'Customer Name', 'Email', 'Phone', 'Address', 'Price', 'Order Status', 'Order Date'];
         foreach ($headers as $header) {
             $table->addCell(2000)->addText($header, ['bold' => true]);
         }
-
-        // Table Data
-        foreach ($orders as $order) {
+foreach ($orders as $order) {
             $customer = $users[$order->customerId] ?? null;
             $orderItem = $orderItems->where('orderId', $order->id)->first();
             $product = $orderItem ? ($products[$orderItem->product_id] ?? null) : null;
-
             $table->addRow();
             $table->addCell(2000)->addText($order->id);
             $table->addCell(3000)->addText($product ? $product->name : 'Unknown');
@@ -171,7 +153,6 @@ return view('registerSeller', compact('User'));
             $table->addCell(2000)->addText($order->created_at->format('d-m-Y'));
         }
 
-        // Save the Word file
         $fileName = 'orders_report.docx';
         $path = storage_path($fileName);
         $wordWriter = IOFactory::createWriter($phpWord, 'Word2007');
@@ -179,9 +160,6 @@ return view('registerSeller', compact('User'));
 
         return response()->download($path)->deleteFileAfterSend(true);
     }
-
-
-
 public function questions()
 {
     $questions = Questions::with(['user', 'product'])->get();
@@ -192,22 +170,16 @@ public function questions()
     public function changeStatus(Request $request)
 {
     $order = DB::table('orders')->where('id', $request->id)->first();
-
     if (!$order) {
         return response()->json(['success' => false, 'message' => 'Order not found']);
     }
 
     DB::table('orders')->where('id', $request->id)->update(['status' => $request->status]);
-
     return response()->json(['success' => true, 'message' => 'Order status updated']);
 }
-
-
 public function Orders(Request $request)
 {
-    $sellerId = Auth::id(); // Assuming logged-in seller
-
-    // Base Orders Query
+    $sellerId = Auth::id(); 
     $query = DB::table('orders')
         ->join('users', 'orders.customerId', '=', 'users.id')
         ->select(
@@ -218,31 +190,24 @@ public function Orders(Request $request)
             'users.email',
             'users.status as userStatus'
         );
-
-    // [Filtering Logic Here - Same As Before]
-
     $orders = $query->orderBy('orders.created_at', 'desc')->get();
-
-    // Fetch Order Items
     $orderItems = DB::table('order_items')
         ->join('products', 'order_items.productId', '=', 'products.id')
         ->leftJoin('product_images', 'products.id', '=', 'product_images.product_id')
         ->select(
             'products.title',
             'products.category',
-            'products.user_id', // seller check
+            'products.user_id', 
             'products.price',
             'product_images.product_images as picture',
             'order_items.*'
         )
         ->get();
 
-    // ✅ Total Listings by Seller
     $totalListings = DB::table('products')
         ->where('user_id', $sellerId)
         ->count();
 
-    // ✅ Delivered Orders Count
     $deliveredOrdersCount = DB::table('orders')
         ->where('status', 'Delivered')
         ->whereExists(function ($query) use ($sellerId) {
@@ -254,7 +219,6 @@ public function Orders(Request $request)
         })
         ->count();
 
-    // ✅ Pending Orders Count
     $pendingOrdersCount = DB::table('orders')
         ->where('status', 'Pending')
         ->whereExists(function ($query) use ($sellerId) {
@@ -266,7 +230,6 @@ public function Orders(Request $request)
         })
         ->count();
 
-    // ✅ Total Revenue (only for seller’s products)
     $totalRevenue = DB::table('order_items')
         ->join('products', 'order_items.productId', '=', 'products.id')
         ->join('orders', 'order_items.orderId', '=', 'orders.id')
@@ -283,14 +246,6 @@ public function Orders(Request $request)
         'totalRevenue'
     ));
 }
-
-
-
-
-
-
-
-
 public function showproduct(Request $request)
 {
     $wishlistItems = Wishlist::where('customerId', session()->get('id'))->pluck('productId')->toArray();
@@ -333,7 +288,6 @@ public function showproduct(Request $request)
 
     return view('showproduct', compact('product', 'wishlistItems'));
 }
-
     public function buyNow($productId)
     {
         if (!session()->has('id')) {
@@ -362,12 +316,10 @@ public function showproduct(Request $request)
 
         return redirect()->route('checkout');
     }
-
     public function googlesignup()
     {
         return Socialite::driver('google')->redirect();
     }
-
     public function googleCallback()
     {
         try {
@@ -395,55 +347,42 @@ public function showproduct(Request $request)
     {
         return Socialite::driver('google')->redirect();
     }
-
-    // Handle Google callback
     public function handleGoogle()
     {
         try {
-            // Get Google user details
             $googleUser = Socialite::driver('google')->user();
-
-            // Check if user already exists
             $user = User::where('google_id', $googleUser->id)->first();
 
             if (!$user) {
-                // If user with same email exists but without google_id, prevent conflict
                 $existingUser = User::where('email', $googleUser->email)->first();
                 if ($existingUser) {
                    return redirect()->route('login')->with('error', 'This email is already in use. Please login manually.');
                 }
-
-                // Create a new user
                 $user = User::create([
                     'name' => $googleUser->name,
                     'email' => $googleUser->email,
                     'google_id' => $googleUser->id,
                     'google_token' => $googleUser->token,
                     'google_refresh_token' => $googleUser->refreshToken ?? null,
-                    'password' => Hash::make(uniqid()), // Generate a random password
-                    'type' => 'customer' // Default role
+                    'password' => Hash::make(uniqid()), 
+                    'type' => 'customer' 
                 ]);
             } else {
-                // Update user's Google tokens if they exist
                 $user->update([
                     'google_token' => $googleUser->token,
                     'google_refresh_token' => $googleUser->refreshToken ?? $user->google_refresh_token,
                 ]);
             }
-
-            // Manually set session for user authentication
             Session::put('id', $user->id);
             Session::put('type', $user->type);
             Session::save();
 
             // Success message
             session()->flash('success', 'Login successful!');
-
-            // Redirect user based on their role
             return ($user->type === 'customer') ? redirect('/') : redirect('/admin');
 
         } catch (Exception $e) {
-            \Log::error('Google Login Error: ' . $e->getMessage()); // Log the error for debugging
+            \Log::error('Google Login Error: ' . $e->getMessage()); 
            return redirect()->route('login')->with('error', 'Authentication failed. Please try again.');
         }
     }
@@ -452,18 +391,13 @@ public function showproduct(Request $request)
     public function productdetails($id)
     {
         $product = Product::where('id', $id)->with('productImages')->firstOrFail();
-
-        // Increment views count
         $sessionKey = 'viewed_product_' . $id;
 
         if (!session()->has($sessionKey)) {
             $product->increment('views');
             session([$sessionKey => true]);
         }
-
         $question = Product::with('questions.user')->findOrFail($id);
-
-        // Fetch product ratings
         $ratings = Rating::where('product_id', $id)->get();
         $averageRating = $ratings->avg('rating');
 
@@ -508,10 +442,7 @@ public function showproduct(Request $request)
 
         return view('contact');
     }
-  
-
-
-public function dashboard(Request $request)
+  public function dashboard(Request $request)
 {
     if ((session('type') === 'seller' || session('type') === 'admin') && session()->has('id')) {
         $user = User::find(session()->get('id'));
@@ -547,7 +478,7 @@ public function dashboard(Request $request)
             ->join('order_items', 'orders.id', '=', 'order_items.orderId')
             ->join('products', 'order_items.productId', '=', 'products.id')
             ->join('users', 'orders.customerId', '=', 'users.id')
-            ->where('products.user_id', $user->id) // you use user_id to link sellers
+            ->where('products.user_id', $user->id) 
             ->where('orders.status', 'delivered')
             ->whereBetween('orders.created_at', $dateRange)
             ->select(
@@ -581,12 +512,7 @@ public function dashboard(Request $request)
 
     return redirect()->route('login')->with('error', 'Something went wrong');
 }
-
-    
-       
-
-
-    public function wishlist()
+   public function wishlist()
     {
         if (!session()->has('id')) {
            return redirect()->route('login')->with('error', 'Please log in to access your wishlist.');
@@ -599,46 +525,38 @@ public function dashboard(Request $request)
                 'products.title',
                 'products.price',
                 DB::raw('MIN(product_images.product_images) as picture'),
-                'wishlists.id', // Add wishlists.id here
+                'wishlists.id', 
                 'wishlists.customerId',
                 'wishlists.productId',
-                'wishlists.created_at' // Add all other columns from wishlists that you're selecting
+                'wishlists.created_at' 
             )
             ->where('wishlists.customerId', session()->get('id'))
             ->groupBy(
                 'products.Id',
                 'products.title',
                 'products.price',
-                'wishlists.id', // Add wishlists.id to GROUP BY
+                'wishlists.id', 
                 'wishlists.customerId',
                 'wishlists.productId',
-                'wishlists.created_at' // Group by any other columns you select from wishlists
+                'wishlists.created_at' 
             )
             ->get();
 
         return view('wishlist', compact('wishlistItems'));
     }
-
-
-
-
-
     public function index()
     {
         $wishlistItems = Wishlist::where('customerId', session()->get('id'))
             ->pluck('productId')
             ->toArray();
-
-        // Fetch all active products with ratings and review count
         $product = Product::with('productImages')
-            ->withAvg('ratings', 'rating') // Fetch average rating
+            ->withAvg('ratings', 'rating') 
             ->withCount(['ratings as reviews_count' => function ($query) {
-                $query->whereNotNull('review'); // Count only rows with reviews
+                $query->whereNotNull('review'); 
             }])
             ->where('status', 'active')
-            ->paginate(8, ['*'], 'products_page');
+            ->paginate(12, ['*'], 'products_page');
 
-        // Fetch top-rated products
         $productwithrating = Product::with('productImages')
             ->withAvg('ratings', 'rating')
             ->withCount(['ratings as reviews_count' => function ($query) {
@@ -650,9 +568,6 @@ public function dashboard(Request $request)
 
         return view('index', compact('product', 'wishlistItems', 'productwithrating'));
     }
-
-
-
         public function faq()
     {
 
@@ -663,18 +578,11 @@ public function dashboard(Request $request)
 
         return view('forgetpassword');
     }
-    public function listingsidebar()
-    {
-
-
-    }
+   
     public function furnitureforms($category)
     {
         return view('furnitureforms', ['category' => $category]);
     }
-
-
-
     public function mylisting()
 {
     if (!session()->has('id')) {
@@ -683,10 +591,9 @@ public function dashboard(Request $request)
 
     $userId = session('id');
 
-    // Fetch products with their views and productImages relationship
     $products = Product::select('id', 'title', 'description', 'views', 'price', 'status', 'user_id')
                 ->where('user_id', $userId)
-                ->with('productImages') // eager loading images
+                ->with('productImages') 
                 ->orderBy('created_at', 'desc')
                 ->get();
 
@@ -697,9 +604,6 @@ public function dashboard(Request $request)
 $policy = PrivacyPolicy::first();
         return view('privacypolicy', compact('policy'));
     }
-
-
-
     public function reviews()
 {
     $userId = session('id');
@@ -708,45 +612,40 @@ $policy = PrivacyPolicy::first();
        return redirect()->route('login')->with('error', 'Please log in to view your reviews.');
     }
 
-    // Fetch reviews given by the logged-in user
     $userReviews = DB::table('ratings')
         ->join('products', 'ratings.product_id', '=', 'products.id') // Get product details
         ->select(
             'ratings.*',
             'products.title as product_title',
-            'products.type as product_type',  // Fetch product type
-            'products.category as product_category'  // Fetch product category
+            'products.type as product_type',  
+            'products.category as product_category'  
         )
-        ->where('ratings.user_id', $userId) // Filter by logged-in user
+        ->where('ratings.user_id', $userId)
         ->orderBy('ratings.created_at', 'desc')
         ->get();
 
-    // Fetch reviews on products that belong to the logged-in user (seller)
     $sellerReviews = DB::table('ratings')
-        ->join('users', 'ratings.user_id', '=', 'users.id') // Reviewer details
-        ->join('products', 'ratings.product_id', '=', 'products.id') // Product details
+        ->join('users', 'ratings.user_id', '=', 'users.id') 
+        ->join('products', 'ratings.product_id', '=', 'products.id') 
         ->select(
             'ratings.*',
             'users.name as reviewer_name',
             'users.profile_picture',
             'products.title as product_title',
-            'products.type as product_type',  // Fetch product type
-            'products.category as product_category'  // Fetch product category
+            'products.type as product_type',  
+            'products.category as product_category' 
         )
-        ->where('products.user_id', $userId) // Filter by seller's products
+        ->where('products.user_id', $userId)
         ->orderBy('ratings.created_at', 'desc')
         ->get();
 
     return view('reviews', compact('userReviews', 'sellerReviews'));
 }
-
-
-    public function termscondition()
+public function termscondition()
     {
 
         return view('termscondition');
     }
-
     public function testingmail()
     {
 

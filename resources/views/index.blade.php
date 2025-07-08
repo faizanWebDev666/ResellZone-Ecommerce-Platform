@@ -220,7 +220,7 @@
                 <div class="container my-5">
                     <div class="row zoom-out" id="product-section" style="display: none;">
                         @foreach ($product->where('status', 'active') as $pro)
-                            <div class="col-6 col-md-3 col-lg-3">
+                            <div class="col-6 col-md-3 col-lg-3 mb-4">
                                 <div class="card border-0 shadow-sm h-100"
                                     style="border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease-in-out;"
                                     onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0px 10px 20px rgba(0,0,0,0.2)';"
@@ -270,7 +270,7 @@
                     <!-- Skeleton Loader -->
                     <div class="row zoom-out" id="skeleton-loader">
                         @for ($i = 0; $i < 8; $i++)
-                            <div class="col-6 col-md-3 col-lg-3">
+                            <div class="col-6 col-md-3 col-lg-3 mb-4">
                                 <div class="card border-0 shadow-sm h-100 skeleton-card">
                                     <div class="skeleton-image"></div>
                                     <div class="card-body text-center p-2">
@@ -302,6 +302,8 @@
                     </div>
                 @endif
             </section>
+
+
 
             <!-- Skeleton CSS -->
             <style>
@@ -356,7 +358,7 @@
                     <div class="container my-5">
                         <div class="row zoom-out">
                             @foreach ($productwithrating as $pro)
-                                <div class="col-6 col-md-3 col-lg-3">
+                                <div class="col-6 col-md-3 col-lg-3 mb-4">
                                     <div class="card border-0 shadow-sm h-100"
                                         style="border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease-in-out;"
                                         onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0px 10px 20px rgba(0,0,0,0.2)';"

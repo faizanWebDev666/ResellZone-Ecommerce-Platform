@@ -234,6 +234,54 @@
                             </div>
                             <div class="counter">Selected: <span id="selectedCount">0</span></div>
                         </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const allowedTypes = ['image/jpeg', 'image/png', 'image/jpg'];
+        const maxSize = 2 * 1024 * 1024; // 2MB
+
+        const imageInputs = document.querySelectorAll('.image-input');
+
+        imageInputs.forEach(input => {
+            input.addEventListener('change', function (e) {
+                const file = this.files[0];
+                const index = this.dataset.index;
+                const preview = document.getElementById(`preview${index}`);
+                const label = this.closest('.image-upload-placeholder');
+
+                // Remove previous error style
+                preview.style.border = '';
+                preview.title = '';
+
+                if (file) {
+                    if (!allowedTypes.includes(file.type) || file.size > maxSize) {
+                        // Invalid file
+                        preview.src = '';
+                        preview.style.border = '2px solid red';
+                        preview.title = 'Invalid file: Only JPG, JPEG, PNG (max 2MB)';
+                        alert(`Invalid image selected in slot ${parseInt(index) + 1}. Only JPG, JPEG, PNG under 2MB are allowed.`);
+                        this.value = ''; // Clear the input
+                    } else {
+                        // Valid file, show preview
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            preview.src = e.target.result;
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                } else {
+                    preview.src = '';
+                }
+            });
+        });
+    });
+</script>
+<style>
+    .img-fluid {
+        width: 100%;
+        height: 100px;
+        object-fit: cover;
+    }
+</style>
 
                         <script>
                             document.addEventListener('DOMContentLoaded', function() {
@@ -331,6 +379,38 @@
                                 placeholder="Enter your name" required>
                             <small id="name-error" class="text-danger d-none">Only letters and spaces are allowed.</small>
                         </div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const nameInput = document.getElementById("name-input");
+        const nameError = document.getElementById("name-error");
+
+        function isValidName(name) {
+            const regex = /^[A-Za-z\s]+$/;
+            if (!regex.test(name)) return false;
+
+            const words = name.trim().split(/\s+/);
+            return words.every(word => word.length >= 2);
+        }
+
+        nameInput.addEventListener("input", function () {
+            if (!isValidName(this.value)) {
+                nameInput.classList.add("is-invalid");
+                nameError.classList.remove("d-none");
+                nameError.textContent = "Only letters, spaces, and valid words (2+ letters) allowed.";
+            } else {
+                nameInput.classList.remove("is-invalid");
+                nameError.classList.add("d-none");
+            }
+        });
+
+        // Auto-capitalize on blur (optional)
+        nameInput.addEventListener("blur", function () {
+            this.value = this.value
+                .toLowerCase()
+                .replace(/\b\w/g, c => c.toUpperCase());
+        });
+    });
+</script>
 
                         <input type="hidden" name="category" value="{{ request('category') }}">
                         <div class="mb-4">
