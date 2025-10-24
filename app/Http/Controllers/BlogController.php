@@ -58,7 +58,7 @@ class BlogController extends Controller
    public function like($id)
 {
     $blog = blogs::findOrFail($id);
-    $blog->increment('likes_count'); // increments the count by 1
+    $blog->increment('likes_count'); 
     return back();
 }
 

@@ -2,7 +2,6 @@
 @section('title', 'Home')
 @section('main-container')
     </head>
-
     <body>
         <section class="banner-section banner-seven">
             <div class="container">
@@ -106,49 +105,55 @@
 
             </div>
         </section>
+ <!-- Category Section -->
+    <div class="py-5" style="background-color: #f7f9fc;">
+        <div class="container text-center">
+            <h2 class="fw-bold display-6 mb-2">Browse Our <span class="text-primary">Categories</span></h2>
+            <p class="text-muted mb-5">Find your desired products from various sections</p>
 
-       <!-- Category Section -->
-<div class="py-5" style="background-color: #f7f9fc;">
-    <div class="container text-center">
-        <h2 class="fw-bold display-6 mb-2">Browse Our <span class="text-primary">Categories</span></h2>
-        <p class="text-muted mb-5">Find your desired products from various sections</p>
+            <div class="row g-4">
+                @php
+                    $categories = [
+                        ['name' => 'Vehicles', 'img' => 'vehicles.png', 'icon' => 'fa-car'],
+                        ['name' => 'Electronics', 'img' => 'electronics.png', 'icon' => 'fa-laptop'],
+                        ['name' => 'Fashion Style', 'img' => 'fashion.png', 'icon' => 'fa-tshirt'],
+                        ['name' => 'Health Care', 'img' => 'health.png', 'icon' => 'fa-heartbeat'],
+                        ['name' => 'Job Board', 'img' => 'job.png', 'icon' => 'fa-briefcase'],
+                        ['name' => 'Mobiles', 'img' => 'mobiles.png', 'icon' => 'fa-mobile-alt'],
+                        ['name' => 'Real Estate', 'img' => 'estates.png', 'icon' => 'fa-home'],
+                        ['name' => 'Services', 'img' => 'travels.png', 'icon' => 'fa-concierge-bell'],
+                        ['name' => 'Kids', 'img' => 'sports.png', 'icon' => 'fa-child'],
+                        ['name' => 'Books', 'img' => 'magznes.png', 'icon' => 'fa-book'],
+                        ['name' => 'Pet & Animal', 'img' => 'pets.png', 'icon' => 'fa-paw'],
+                        ['name' => 'Furniture', 'img' => 'furniture.png', 'icon' => 'fa-couch'],
+                    ];
+                @endphp
 
-        <div class="row g-4">
-            @php
-                $categories = [
-                    ['name' => 'Vehicles', 'img' => 'vehicles.png'],
-                    ['name' => 'Electronics', 'img' => 'electronics.png'],
-                    ['name' => 'Fashion Style', 'img' => 'fashion.png'],
-                    ['name' => 'Health Care', 'img' => 'health.png'],
-                    ['name' => 'Job Board', 'img' => 'job.png'],
-                    ['name' => 'Mobiles', 'img' => 'mobiles.png'],
-                    ['name' => 'Real Estate', 'img' => 'estates.png'],
-                    ['name' => 'Services', 'img' => 'travels.png'],
-                    ['name' => 'Kids', 'img' => 'sports.png'],
-                    ['name' => 'Books', 'img' => 'magznes.png'],
-                    ['name' => 'Pet & Animal', 'img' => 'pets.png'],
-                    ['name' => 'Furniture', 'img' => 'furniture.png'],
-                ];
-            @endphp
-
-            @foreach ($categories as $category)
-                <div class="col-lg-3 col-md-4 col-sm-6">
-                    <a href="{{ route('show-product', ['category' => strtolower($category['name'])]) }}" class="text-decoration-none">
-                        <div class="card border-0 shadow-sm rounded-4 h-100 text-center category-card transition">
-                            <div class="card-body py-4">
-                                <img src="{{ asset('frontend/img/icons/index/' . $category['img']) }}"
-                                     alt="{{ $category['name'] }}"
-                                     class="img-fluid mb-3"
-                                     style="height: 60px;">
-                                <h6 class="fw-semibold text-dark">{{ $category['name'] }}</h6>
+                @foreach ($categories as $category)
+                    <div class="col-lg-3 col-md-4 col-sm-6">
+                        <a href="{{ route('show-product', ['category' => strtolower($category['name'])]) }}" class="text-decoration-none">
+                            <div class="card border-0 shadow-sm rounded-4 h-100 text-center category-card transition">
+                                <div class="card-body py-4">
+                                    <!-- Image with fallback to icon -->
+                                    <div class="icon-container">
+                                        <img src="{{ asset('frontend/img/icons/index/' . $category['img']) }}"
+                                             alt="{{ $category['name'] }}"
+                                             class="category-img"
+                                             onerror="this.style.display='none'; document.getElementById('icon-{{ $loop->index }}').style.display='block';">
+                                        <div id="icon-{{ $loop->index }}" class="icon-placeholder" style="display: none;">
+                                            <i class="fas {{ $category['icon'] }} text-primary"></i>
+                                        </div>
+                                    </div>
+                                    <h6 class="fw-semibold text-dark">{{ $category['name'] }}</h6>
+                                </div>
                             </div>
-                        </div>
-                    </a>
-                </div>
-            @endforeach
+                        </a>
+                    </div>
+                @endforeach
+            </div>
         </div>
     </div>
-</div>
+
      <style>
         
                 /* Zoom-out effect */
@@ -201,107 +206,184 @@
             </style>
             <!-- Section Start -->
             <section>
-                <div class="section-heading">
-                    <div class="container">
-                        <div class="row zoom-out">
-                            <div class="col-md-6 aos aos-init aos-animate" data-aos="fade-up">
-                                <h2>Lat<span class="title-right">est</span> Products</h2>
-                                <p>Explore our latest products and discover trending new arrivals.</p>
+    <div class="section-heading">
+        <div class="container">
+            <div class="row zoom-out">
+                <div class="col-md-6 aos aos-init aos-animate" data-aos="fade-up">
+                    <h2>Lat<span class="title-right">est</span> Products</h2>
+                    <p>Explore our latest products and discover trending new arrivals.</p>
+                </div>
+                <div class="col-md-6 text-md-end aos aos-init aos-animate" data-aos="fade-up">
+                    <a href="{{ URL::to('show-product') }}"
+                        class="btn btn-maroon text-white px-4 py-2 rounded-3">View All</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Product Display Section -->
+    <div class="container my-5">
+        <div class="row zoom-out" id="product-section" style="display: none;">
+            @foreach ($product->where('status', 'active') as $pro)
+                <div class="col-6 col-md-3 col-lg-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100"
+                        style="border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease-in-out;"
+                        onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0px 10px 20px rgba(0,0,0,0.2)';"
+                        onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0px 4px 8px rgba(0,0,0,0.1)';">
+
+                        <a href="{{ route('product-details', ['id' => $pro->id]) }}"
+                            class="text-decoration-none text-dark">
+                            <div class="position-relative">
+                                <img src="{{ $pro->productImages->first()->product_images ?? asset('images/default.jpg') }}"
+                                    class="card-img-top" alt="Product Image"
+                                    style="height: 190px; object-fit: cover;">
                             </div>
-                            <div class="col-md-6 text-md-end aos aos-init aos-animate" data-aos="fade-up">
-                                <a href="{{ URL::to('show-product') }}"
-                                    class="btn btn-maroon text-white px-4 py-2 rounded-3">View All</a>
+
+                            <div class="card-body text-center p-2">
+                                <h6 class="fw-bold text-truncate mb-1" style="font-size: 14px;">
+                                    {{ Str::limit($pro->title, 30) }}
+                                </h6>
+                                <p class="small text-muted mb-1" style="font-size: 12px;">
+                                    <i class="fa fa-map-marker-alt"></i> {{ $pro->city ?? 'N/A' }}
+                                </p>
+
+                                @php
+                                    $adjustedPrice =
+                                        ($pro->price ?? 0) > 200 ? $pro->price - 200 : $pro->price ?? 0;
+                                @endphp
+                                <div class="d-flex justify-content-center align-items-center">
+                                    <span class="fw-bold text-danger me-2 fs-5">
+                                        PKR {{ number_format($adjustedPrice, 2) }}
+                                    </span>
+                                    <small
+                                        class="text-muted"><del>${{ number_format($pro->price ?? 0, 2) }}</del></small>
+                                </div>
+
+                               
                             </div>
+                        </a>
+
+                        <button type="button" onclick="addToWishlist(event, {{ $pro->id }})"
+                            style="position: absolute; top: 10px; right: 10px; border: none; background: none;">
+                            <i id="heart-icon-{{ $pro->id }}"
+                                class="fa {{ in_array($pro->id, $wishlistItems) ? 'fa-heart' : 'far fa-heart' }} text-danger"
+                                style="font-size: 24px;"></i>
+                        </button>
+                         <!-- Quick View Button -->
+                               <div class="text-center mt-2">
+    <button class="btn btn-sm btn-outline-primary"
+        data-bs-toggle="modal"
+        data-bs-target="#quickViewModal"
+        data-title="{{ $pro->title }}"
+        data-city="{{ $pro->city ?? 'N/A' }}"
+        data-description="{{ $pro->description ?? 'N/A' }}"
+        data-price="PKR {{ number_format($pro->price ?? 0, 2) }}"
+        data-image="{{ $pro->productImages->first()->product_images ?? asset('images/default.jpg') }}">
+        Quick View
+    </button>
+</div>
+
+                    </div>
+                    
+                </div>
+            @endforeach
+        </div>
+
+        <!-- Quick View Modal (Static Content for Now) -->
+<!-- Quick View Modal -->
+<div class="modal fade" id="quickViewModal" tabindex="-1" aria-labelledby="quickViewLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content" style="border-radius: 12px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quickViewLabel">Product Quick View</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row">
+          <!-- Product Image -->
+          <div class="col-md-6">
+            <img id="quickViewImage"
+                 src=""
+                 class="img-fluid rounded"
+                 alt="Product Image">
+          </div>
+
+          <!-- Product Info -->
+          <div class="col-md-6">
+            <h4 id="quickViewTitle">Product Title</h4>
+            <p class="text-muted" id="quickViewCity">City / Location</p>
+            <h5 class="text-danger" id="quickViewPrice">PKR 0</h5>
+            <p class="small" id="quickViewDescription">This is a short description of the product for quick view purposes.</p>
+
+            <div class="d-flex gap-2">
+              <button class="btn btn-primary">Add to Cart</button>
+              <button class="btn btn-outline-danger">
+                <i class="fa fa-heart"></i> Wishlist
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var quickViewModal = document.getElementById('quickViewModal');
+    quickViewModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget;
+
+        var title = button.getAttribute('data-title');
+        var city = button.getAttribute('data-city');
+        var price = button.getAttribute('data-price');
+        var image = button.getAttribute('data-image');
+        var description = button.getAttribute('data-description');
+
+
+        document.getElementById('quickViewTitle').innerText = title;
+        document.getElementById('quickViewCity').innerText = city;
+        document.getElementById('quickViewPrice').innerText = price;
+        document.getElementById('quickViewImage').src = image;
+        document.getElementById('quickViewDescription').innerText = description;
+    });
+});
+</script>
+
+        <!-- Skeleton Loader -->
+        <div class="row zoom-out" id="skeleton-loader">
+            @for ($i = 0; $i < 8; $i++)
+                <div class="col-6 col-md-3 col-lg-3 mb-4">
+                    <div class="card border-0 shadow-sm h-100 skeleton-card">
+                        <div class="skeleton-image"></div>
+                        <div class="card-body text-center p-2">
+                            <div class="skeleton-line mb-2" style="width: 80%; height: 14px;"></div>
+                            <div class="skeleton-line mb-1" style="width: 50%; height: 12px;"></div>
+                            <div class="skeleton-line mb-2" style="width: 60%; height: 14px;"></div>
+                            <div class="skeleton-line mb-1" style="width: 40%; height: 12px;"></div>
                         </div>
                     </div>
                 </div>
+            @endfor
+        </div>
 
-                <!-- Product Display Section -->
-                <div class="container my-5">
-                    <div class="row zoom-out" id="product-section" style="display: none;">
-                        @foreach ($product->where('status', 'active') as $pro)
-                            <div class="col-6 col-md-3 col-lg-3 mb-4">
-                                <div class="card border-0 shadow-sm h-100"
-                                    style="border-radius: 12px; overflow: hidden; cursor: pointer; transition: all 0.3s ease-in-out;"
-                                    onmouseover="this.style.transform='scale(1.05)'; this.style.boxShadow='0px 10px 20px rgba(0,0,0,0.2)';"
-                                    onmouseout="this.style.transform='scale(1)'; this.style.boxShadow='0px 4px 8px rgba(0,0,0,0.1)';">
+        <!-- Pagination -->
+        <div class="d-flex justify-content-center mt-4" id="pagination-wrapper" style="display: none;">
+            <nav>
+                {{ $product->appends(['top_rated_page' => request('top_rated_page')])->links('pagination::bootstrap-5') }}
+            </nav>
+        </div>
+    </div>
 
-                                    <a href="{{ route('product-details', ['id' => $pro->id]) }}"
-                                        class="text-decoration-none text-dark">
-                                        <div class="position-relative">
-                                            <img src="{{ $pro->productImages->first()->product_images ?? asset('images/default.jpg') }}"
-                                                class="card-img-top" alt="Product Image"
-                                                style="height: 190px; object-fit: cover;">
-                                        </div>
-
-                                        <div class="card-body text-center p-2">
-                                            <h6 class="fw-bold text-truncate mb-1" style="font-size: 14px;">
-                                                {{ Str::limit($pro->title, 30) }}
-                                            </h6>
-                                            <p class="small text-muted mb-1" style="font-size: 12px;">
-                                                <i class="fa fa-map-marker-alt"></i> {{ $pro->city ?? 'N/A' }}
-                                            </p>
-
-                                            @php
-                                                $adjustedPrice =
-                                                    ($pro->price ?? 0) > 200 ? $pro->price - 200 : $pro->price ?? 0;
-                                            @endphp
-                                            <div class="d-flex justify-content-center align-items-center">
-                                                <span class="fw-bold text-danger me-2 fs-5">
-                                                    PKR {{ number_format($adjustedPrice, 2) }}
-                                                </span>
-                                                <small
-                                                    class="text-muted"><del>${{ number_format($pro->price ?? 0, 2) }}</del></small>
-                                            </div>
-                                        </div>
-                                    </a>
-
-                                    <button type="button" onclick="addToWishlist(event, {{ $pro->id }})"
-                                        style="position: absolute; top: 10px; right: 10px; border: none; background: none;">
-                                        <i id="heart-icon-{{ $pro->id }}"
-                                            class="fa {{ in_array($pro->id, $wishlistItems) ? 'fa-heart' : 'far fa-heart' }} text-danger"
-                                            style="font-size: 24px;"></i>
-                                    </button>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-
-                    <!-- Skeleton Loader -->
-                    <div class="row zoom-out" id="skeleton-loader">
-                        @for ($i = 0; $i < 8; $i++)
-                            <div class="col-6 col-md-3 col-lg-3 mb-4">
-                                <div class="card border-0 shadow-sm h-100 skeleton-card">
-                                    <div class="skeleton-image"></div>
-                                    <div class="card-body text-center p-2">
-                                        <div class="skeleton-line mb-2" style="width: 80%; height: 14px;"></div>
-                                        <div class="skeleton-line mb-1" style="width: 50%; height: 12px;"></div>
-                                        <div class="skeleton-line mb-2" style="width: 60%; height: 14px;"></div>
-                                        <div class="skeleton-line mb-1" style="width: 40%; height: 12px;"></div>
-                                    </div>
-                                </div>
-                            </div>
-                        @endfor
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="d-flex justify-content-center mt-4" id="pagination-wrapper" style="display: none;">
-                        <nav>
-                            {{ $product->appends(['top_rated_page' => request('top_rated_page')])->links('pagination::bootstrap-5') }}
-                        </nav>
-                    </div>
-                </div>
-
-                <!-- No Products Found Alert -->
-                @if ($product->isEmpty())
-                    <div class="container my-5" style="background-color: #C40032;">
-                        <div class="alert alert-warning text-center shadow-sm"
-                            style="background-color: #C40032; border-color: #C40032; color: white;">
-                            No products found.
-                        </div>
-                    </div>
-                @endif
-            </section>
+    <!-- No Products Found Alert -->
+    @if ($product->isEmpty())
+        <div class="container my-5" style="background-color: #C40032;">
+            <div class="alert alert-warning text-center shadow-sm"
+                style="background-color: #C40032; border-color: #C40032; color: white;">
+                No products found.
+            </div>
+        </div>
+    @endif
+</section>
 
 
 

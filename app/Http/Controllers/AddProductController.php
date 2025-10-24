@@ -75,8 +75,8 @@ class AddProductController extends Controller
             'sex' => 'nullable|in:male,female,pair',
             'age' => 'nullable|integer|min:1|max:20',
             'processor' => 'nullable|string|max:100',
-'ram' => 'nullable|string|max:20',
-'storage' => 'nullable|string|max:100',
+            'ram' => 'nullable|string|max:20',
+            'storage' => 'nullable|string|max:100',
 
         ]);
     
@@ -137,9 +137,8 @@ class AddProductController extends Controller
             $product->sex = $request->sex;
             $product->age = $request->age;
             $product->processor = $request->processor;
-$product->ram = $request->ram;
-$product->storage = $request->storage;
-
+            $product->ram = $request->ram;
+            $product->storage = $request->storage;
             $product->status = $validatedData['status'];
             $product->user_id = $validatedData['user_id'];
                 $product->save();

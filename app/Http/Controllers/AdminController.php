@@ -340,7 +340,6 @@ private function calculatePercentageChange($today, $total)
         $usernewsletters = Newsletter::all();
         return view('backend.User-newsletters', compact('usernewsletters'));
     }
-
     public function destroy($id)
     {
         $contact = Contact::find($id);

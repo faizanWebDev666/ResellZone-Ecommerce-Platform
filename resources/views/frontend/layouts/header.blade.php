@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 
-
-
 <head>
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
@@ -19,9 +17,12 @@
     <link rel="stylesheet" href="{{ asset('frontend/css/style.css') }}">
     @stack('styles')
     @yield('head')
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+
 </head>
 
 <body>
+
     @if (!Request::is('signup') && !Request::is('login'))
         <div class="main-wrapper">
             <header class="header sticky-top shadow-sm bg-white">
@@ -38,77 +39,6 @@
                             <button id="closePopupBtn" class="btn-close btn-close-white" aria-label="Close"></button>
                         </div>
                     </div>
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            // Check if this is the first visit in this session
-                            if (!sessionStorage.getItem("popupShown")) {
-                                // Show the popup
-                                document.getElementById("welcomePopup").style.display = "block";
-
-                                // Auto-close the popup after 900ms
-                                setTimeout(() => {
-                                    document.getElementById("welcomePopup").style.display = "none";
-                                }, 900);
-
-                                // Mark the popup as shown in this session
-                                sessionStorage.setItem("popupShown", "true");
-                            }
-
-                            // Close popup when button is clicked
-                            document.getElementById("closePopupBtn").onclick = function() {
-                                document.getElementById("welcomePopup").style.display = "none";
-                            };
-                        });
-                    </script>
-
-
-                    <script>
-                        document.addEventListener("DOMContentLoaded", function() {
-                            document.querySelector(".close-campaign").addEventListener("click", function() {
-                                document.querySelector(".card").style.display = "none";
-                            });
-                        });
-                    </script>
-
-                    <style>
-                        .navbar-custom {
-                            background-color: white !important;
-
-                            padding: 10px 20px;
-                        }
-
-                        .navbar-brand img {
-                            height: 50px;
-                        }
-
-                        .navbar-nav {
-                            margin-left: auto;
-                        }
-
-                        .icon-container a {
-                            color: white;
-                            font-size: 20px;
-                            margin-right: 15px;
-                        }
-
-                        .btn-sell {
-                            background-color: #C40032;
-                            color: white;
-                            font-weight: bold;
-                            border-radius: 50px;
-                            padding: 8px 20px;
-                        }
-
-                        .dropdown-menu {
-                            min-width: 150px;
-                        }
-
-                        .dropdown-item i {
-                            margin-right: 8px;
-                        }
-                        
-                    </style>
 
                     <nav class="navbar navbar-expand-lg navbar-custom fixed-top">
                         <div class="container-fluid d-flex align-items-center">
@@ -138,7 +68,6 @@
                                         <option value="furniture">Furniture</option>
                                     </select>
 
-                                    <!-- Search Input -->
                                     <input type="text" id="searchQuery" name="query"
                                         class="form-control shadow-sm bg-white text-dark border-white"
                                         placeholder="Search for products..."
@@ -161,7 +90,7 @@
 
                                     if (!category && !query) {
                                         alert("Please select a category or enter a search query.");
-                                        event.preventDefault(); // Stop form submission
+                                        event.preventDefault();
                                     }
                                 });
                             </script>
@@ -175,135 +104,145 @@
                                     }
                                 }
                             </script>
-                            @if (session('type') === 'seller' && session()->has('id')) 
-                            <div class="d-flex align-items-center">
-                                <div class="btn-group">
-                                    <a class="btn btn-sell me-2 d-flex align-items-center"
-                                        href="#">
-                                        <i class="fas fa-plus-circle me-1"></i> Sell
-                                    </a>
-                                    <button type="button" class="btn btn-sell dropdown-toggle dropdown-toggle-split"
-                                        data-bs-toggle="dropdown" aria-expanded="false">
-                                        <i class="fas fa-chevron-down"></i>
-                                    </button>
-                                    <ul class="dropdown-menu dropdown-menu-end"
-                                        style="max-height: 300px; overflow-y: auto;">
-                                        <li><a class="dropdown-item" href="{{ route('categories') }}">All Categories</a>
-                                        </li>
-
-                                        @php
-                                            $categories = [
-                                                'Vehicles',
-                                                'Electronics',
-                                                'fashion style',
-                                                'health care',
-                                                'job board',
-                                                'mobiles',
-                                                'property',
-                                                'services',
-                                                'kids',
-                                                'books & supports',
-                                                'pet & animal',
-                                                'furniture',
-                                            ];
-                                        @endphp
-
-                                        @foreach ($categories as $category)
-                                            <li>
-                                                <a class="dropdown-item"
-                                                    href="{{ route('sellform', ['category' => $category]) }}">
-                                                    {{ $category }}
-                                                </a>
+                            @if (session('type') === 'seller' && session()->has('id'))
+                                <div class="d-flex align-items-center">
+                                    <div class="btn-group">
+                                        <a class="btn btn-sell me-2 d-flex align-items-center" href="#">
+                                            <i class="fas fa-plus-circle me-1"></i> Sell
+                                        </a>
+                                        <button type="button"
+                                            class="btn btn-sell dropdown-toggle dropdown-toggle-split"
+                                            data-bs-toggle="dropdown" aria-expanded="false">
+                                            <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end"
+                                            style="max-height: 300px; overflow-y: auto;">
+                                            <li><a class="dropdown-item" href="{{ route('categories') }}">All
+                                                    Categories</a>
                                             </li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            </div>
 
-@endif
+                                            @php
+                                                $categories = [
+                                                    'Vehicles',
+                                                    'Electronics',
+                                                    'fashion style',
+                                                    'health care',
+                                                    'job board',
+                                                    'mobiles',
+                                                    'property',
+                                                    'services',
+                                                    'kids',
+                                                    'books & supports',
+                                                    'pet & animal',
+                                                    'furniture',
+                                                ];
+                                            @endphp
+
+                                            @foreach ($categories as $category)
+                                                <li>
+                                                    <a class="dropdown-item"
+                                                        href="{{ route('sellform', ['category' => $category]) }}">
+                                                        {{ $category }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    </div>
+                                </div>
+
+                            @endif
                             <a href="{{ route('wishlist') }}" title="Wishlist" class="ms-3 me-3">
                                 <i class="far fa-heart"></i>
                             </a>
 
-                            <a href="{{ route('cart') }}" title="Cart" class="me-3">
+                            <a href="{{ route('cart') }}" title="Cart" class="me-3 position-relative">
                                 <i class="fas fa-shopping-cart"></i>
+                                <span id="cart-count"
+                                    class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+                                    {{ $cartCount ?? 0 }}
+                                </span>
                             </a>
+
+
                             <div class="dropdown">
-                              @if (session()->has('id'))
-    <a href="#"
-        class="dropdown-toggle profile-container d-flex align-items-center"
-        id="profileDropdown" data-bs-toggle="dropdown" title="Profile">
+                                @if (session()->has('id'))
+                                    <a href="#"
+                                        class="dropdown-toggle profile-container d-flex align-items-center"
+                                        id="profileDropdown" data-bs-toggle="dropdown" title="Profile">
 
-        @if (session('profile_picture'))
-            <img src="{{ asset('storage/' . session('profile_picture')) }}"
-                class="rounded-circle" width="40" height="40" alt="User Profile">
-        @endif
+                                        @if (session('profile_picture'))
+                                            <img src="{{ asset('storage/' . session('profile_picture')) }}"
+                                                class="rounded-circle" width="40" height="40"
+                                                alt="User Profile">
+                                        @endif
 
-        <span class="ms-2">Hi,
-            {{ Str::headline(explode(' ', session('name', 'Guest'))[0]) }}</span>
-    </a>
+                                        <span class="ms-2">Hi,
+                                            {{ Str::headline(explode(' ', session('name', 'Guest'))[0]) }}</span>
+                                    </a>
 
-    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
-        @php
-            $showForm = false;
-            if (session('type') === 'seller') {
-                $seller = \App\Models\SellersRegistration::where('user_id', session('id'))->first();
-                if ($seller && $seller->status === 'pending') {
-                    $showForm = true;
-                }
-            }
-        @endphp
+                                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="profileDropdown">
+                                        @php
+                                            $showForm = false;
+                                            if (session('type') === 'seller') {
+                                                $seller = \App\Models\SellersRegistration::where(
+                                                    'user_id',
+                                                    session('id'),
+                                                )->first();
+                                                if ($seller && $seller->status === 'pending') {
+                                                    $showForm = true;
+                                                }
+                                            }
+                                        @endphp
 
-        @if(session('type') === 'seller' || session('type') === 'admin')
-            <li>
-                @if($showForm)
-                    <a class="dropdown-item" href="#">
-                        <i class="far fa-user-circle"></i> Wait For Approval
-                    </a>
-                @else
-                    <a class="dropdown-item" href="{{ route('dashboard') }}">
-                        <i class="far fa-user-circle"></i> Dashboard
-                    </a>
-                @endif
-            </li>
-        @endif
+                                        @if (session('type') === 'seller' || session('type') === 'admin')
+                                            <li>
+                                                @if ($showForm)
+                                                    <a class="dropdown-item" href="#">
+                                                        <i class="far fa-user-circle"></i> Wait For Approval
+                                                    </a>
+                                                @else
+                                                    <a class="dropdown-item" href="{{ route('dashboard') }}">
+                                                        <i class="far fa-user-circle"></i> Dashboard
+                                                    </a>
+                                                @endif
+                                            </li>
+                                        @endif
 
-        @if(session('type') === 'customer')
-            <li>
-                <a class="dropdown-item" href="{{ route('profile') }}">
-                    <i class="far fa-user-circle"></i> Profile
-                </a>
-            </li>
-            <li>
-                <a class="dropdown-item" href="{{ route('seller.updatepassword') }}">
-                    <i class="far fa-user-circle"></i> Reset Password
-                </a>
-            </li>
-             <li>
-                <a class="dropdown-item" href="{{ route('my.orders') }}">
-                    <i class="far fa-user-circle"></i> My Orders
-                </a>
-            </li>
+                                        @if (session('type') === 'customer')
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('profile') }}">
+                                                    <i class="far fa-user-circle"></i> Profile
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('seller.updatepassword') }}">
+                                                    <i class="far fa-user-circle"></i> Reset Password
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item" href="{{ route('my.orders') }}">
+                                                    <i class="far fa-user-circle"></i> My Orders
+                                                </a>
+                                            </li>
+                                        @endif
 
-            
-        @endif
+                                        <li>
+                                            <a class="dropdown-item text-danger" href="{{ route('logout') }}">
+                                                <i class="fas fa-sign-out-alt"></i> Logout
+                                            </a>
+                                        </li>
 
-        <li>
-            <a class="dropdown-item text-danger" href="{{ route('logout') }}">
-                <i class="fas fa-sign-out-alt"></i> Logout
-            </a>
-        </li>
+                                        @if (session('type') === 'admin')
+                                            <li>
+                                                <a class="dropdown-item text-danger"
+                                                    href="{{ route('admin.dashboard') }}">
+                                                    <i class="fas fa-sign-out-alt"></i> Admin
+                                                </a>
+                                            </li>
+                                        @endif
+                                    </ul>
 
-        @if(session('type') === 'admin')
-            <li>
-                <a class="dropdown-item text-danger" href="{{ route('admin.dashboard') }}">
-                    <i class="fas fa-sign-out-alt"></i> Admin
-                </a>
-            </li>
-        @endif
-    </ul>
-
-            </li>
+                                    </li>
                                     </ul>
                                 @else
                                     <a href="#" class="dropdown-toggle profile-container" id="profileDropdown"
@@ -337,91 +276,30 @@
 
 
     @endif
-    {{-- <script>
-        function searchCategory() {
-            const category = document.getElementById('categorySelect').value;
-            if (category) {
-                let route = '';
-                switch (category) {
-                    case 'Vehicles':
-                        route = 'http://127.0.0.1:8000/show-product?category=Vehicles';
-                        break;
-                    case 'electronics':
-                        route = 'http://127.0.0.1:8000/show-product?category=Electronics';
-                        break;
-                    case 'fashion':
-                        route = 'http://127.0.0.1:8000/show-product?category=Fashion+Style';
-                        break;
-                    case 'health':
-                        route = 'http://127.0.0.1:8000/show-product?category=Health+Care';
-                        break;
-                    case 'jobs':
-                        route = 'http://127.0.0.1:8000/show-product?category=Job+Board';
-                        break;
-                    case 'mobiles':
-                        route = 'http://127.0.0.1:8000/show-product?category=Mobiles';
-                        break;
-                    case 'property':
-                        route = 'http://127.0.0.1:8000/show-product?category=Property';
-                        break;
-                    case 'services':
-                        route = 'http://127.0.0.1:8000/show-product?category=Services';
-                        break;
-                    case 'kids':
-                        route = 'http://127.0.0.1:8000/show-product?category=Kids';
-                        break;
-                    case 'books':
-                        route = 'http://127.0.0.1:8000/show-product?category=Books+Supports';
-                        break;
-                    case 'pets':
-                        route = 'http://127.0.0.1:8000/show-product?category=Pet+Animal';
-                        break;
-                    case 'furniture':
-                        route = 'http://127.0.0.1:8000/show-product?category=Furniture';
-                        break;
-                    default:
-                        alert('Invalid category!');
-                        return;
-                }
-                window.location.href = route;
-            } else {
-                alert('Please select a category before searching!');
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            if (!sessionStorage.getItem("popupShown")) {
+                document.getElementById("welcomePopup").style.display = "block";
+
+                setTimeout(() => {
+                    document.getElementById("welcomePopup").style.display = "none";
+                }, 900);
+
+                sessionStorage.setItem("popupShown", "true");
             }
-        }
-    </script> --}}
 
-    {{-- <script>
-        $(document).ready(function() {
-            let categories = [
-                "Vehicles", "Electronics", "Fashion Style", "Health Care", "Job Board",
-                "Mobiles", "Property", "Services", "Kids", "Books & Supports",
-                "Pet & Animal", "Furniture"
-            ];
+            document.getElementById("closePopupBtn").onclick = function() {
+                document.getElementById("welcomePopup").style.display = "none";
+            };
+        });
 
-            $("#searchInput").on("input", function() {
-                let query = $(this).val().toLowerCase();
-                let suggestions = categories.filter(item => item.toLowerCase().includes(query));
-
-                if (query.length > 0) {
-                    let suggestionHTML = suggestions.map(item => `<li>${item}</li>`).join("");
-                    $("#suggestionList").html(suggestionHTML).show();
-                } else {
-                    $("#suggestionList").hide();
-                }
-            });
-
-            $(document).on("click", "#suggestionList li", function() {
-                $("#searchInput").val($(this).text());
-                $("#suggestionList").hide();
-            });
-
-            $(document).click(function(e) {
-                if (!$(e.target).closest(".search-container").length) {
-                    $("#suggestionList").hide();
-                }
+        document.addEventListener("DOMContentLoaded", function() {
+            document.querySelector(".close-campaign").addEventListener("click", function() {
+                document.querySelector(".card").style.display = "none";
             });
         });
-    </script> --}}
+    </script>
 
 </html>
 <style>
@@ -500,8 +378,6 @@
         background-color: #C40032 border-color:#C40032
     }
 
-
-
     .navbar-nav .nav-link {
         transition: all 0.3s ease-in-out;
         position: relative;
@@ -543,5 +419,41 @@
         background-color: #0d6efd;
         color: #fff;
         border-color: #0d6efd;
+    }
+
+    .navbar-custom {
+        background-color: white !important;
+
+        padding: 10px 20px;
+    }
+
+    .navbar-brand img {
+        height: 50px;
+    }
+
+    .navbar-nav {
+        margin-left: auto;
+    }
+
+    .icon-container a {
+        color: white;
+        font-size: 20px;
+        margin-right: 15px;
+    }
+
+    .btn-sell {
+        background-color: #C40032;
+        color: white;
+        font-weight: bold;
+        border-radius: 50px;
+        padding: 8px 20px;
+    }
+
+    .dropdown-menu {
+        min-width: 150px;
+    }
+
+    .dropdown-item i {
+        margin-right: 8px;
     }
 </style>

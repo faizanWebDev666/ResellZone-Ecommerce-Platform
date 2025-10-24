@@ -26,7 +26,7 @@ class CartController extends Controller
             ->join('carts', 'carts.productId', '=', 'products.Id')
             ->leftJoin('product_images', 'product_images.product_id', '=', 'products.Id')
             ->select(
-                'products.title',
+       'products.title',
                 'products.price',
                 'carts.quantity',  
                 'carts.id',
@@ -37,7 +37,7 @@ class CartController extends Controller
             )
             ->where('carts.customerId', session()->get('id'))
             ->groupBy(
-                'carts.id',
+        'carts.id',
                 'products.title',
                 'products.price',
                 'carts.quantity',  
@@ -51,15 +51,15 @@ class CartController extends Controller
     }
     public function deleteCartItem($id)
     {
-        $item = Cart::find($id);
-        $item->delete();
-        return redirect()->back()->with('success', 'One Item deleted from Cart');
+            $item = Cart::find($id);
+            $item->delete();
+            return redirect()->back()->with('success', 'One Item deleted from Cart');
     }
-
 
     public function updateCart(Request $data)
     {
         if (session()->has('id')) {
+
             $item = Cart::find($data->input('id'));
             $item->quantity = $data->input('quantity');
             $item->save();
@@ -83,11 +83,10 @@ class CartController extends Controller
                             ->first();
 
         if ($existingItem) {
-            // If product exists, update the quantity
             $existingItem->quantity += $quantity;
             $existingItem->save();
+
         } else {
-            // If product does not exist, create a new cart item
             $item = new Cart();
             $item->quantity = $quantity;
             $item->productId = $productId;
@@ -95,11 +94,13 @@ class CartController extends Controller
             $item->save();
         }
 
-        // Get the updated cart count for the user
-        $cartCount = Cart::where('customerId', $customerId)->count();
+        $cartCount = Cart::where('customerId', $customerId)->sum('quantity');
 
-        return redirect()->back()->with('success', 'Success! Items Added into Cart.');
-
+        return response()->json([
+            'success' => true,
+            'message' => 'Item added to cart!',
+            'cartCount' => $cartCount
+        ]);
     } else {
         return response()->json([
             'success' => false,

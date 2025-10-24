@@ -4,6 +4,7 @@ use App\Http\Controllers\BlogController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CheckoutController;
+use App\Http\Controllers\TurnstileController;
 use App\Http\Controllers\ContatsController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\ForgotPasswordController;
@@ -121,8 +122,11 @@ Route::post('/sellform', [ProductController::class, 'store'])->name('sellform.st
 Route::post('/categories/addProduct', [AddProductController::class, 'addProduct']);
 Route::post('/categories/all', [AddProductController::class, 'AllCategoriesForm']);
 
-// Customer Routes
-Route::get('/', [MainController::class, 'index'])->name('home');
+
+    Route::get('/', [MainController::class, 'index'])->name('home');
+    Route::get('/about', [MainController::class, 'about']);
+
+
 Route::get('cart', [CartController::class, 'cart'])->name('cart');
 Route::post('addtocart', [CartController::class, 'addtocart'])->name('addToCart');
 Route::get('deleteCartItem/{id}', [CartController::class, 'deleteCartItem']);
